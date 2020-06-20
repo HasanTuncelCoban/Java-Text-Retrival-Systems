@@ -80,7 +80,7 @@ public class searchUI extends JFrame {
 		contentsTxt.setWrapStyleWord(true);
 
 		scrollPane = new JScrollPane(contentsTxt);
-		scrollPane.setBounds(136, 145, 347, 266);
+		scrollPane.setBounds(92, 175, 486, 266);
 		// scrollPane.add(contentsTxt);
 		contentPane.add(scrollPane);
 		// contentPane.add(contentsTxt);
@@ -105,7 +105,7 @@ public class searchUI extends JFrame {
 				if(date.isSelected()) {
 					date();
 				}else if(topics.isSelected()) {
-					topic();
+					topics();
 				}
 				else {
 					title();
@@ -128,7 +128,7 @@ public class searchUI extends JFrame {
 		JLabel lblNewLabel = new JLabel("Resault :");
 		lblNewLabel.setForeground(Color.RED);
 		lblNewLabel.setFont(new Font("Calibri", Font.BOLD, 15));
-		lblNewLabel.setBounds(59, 146, 55, 19);
+		lblNewLabel.setBounds(27, 176, 55, 19);
 		contentPane.add(lblNewLabel);
 		
 		
@@ -158,40 +158,57 @@ public class searchUI extends JFrame {
 		String temp="<TITLE>"+searchTxt.getText()+ "</TITLE>";
 		//System.out.println("Hello World");
 		
-        try {
-     	   for(int i=0;i<22;i++) {
-     			BufferedReader reader= new BufferedReader(new FileReader("src\\\\javasearchengine/read/reut2-"+i+".sgm"));
-     			StringBuilder strB=new StringBuilder();
-     			String str= "";
-     			StringBuilder testB=new StringBuilder();
-     			String body= "";
-     			
-     			do {
-     				str =reader.readLine();
-     				if(str==null)break;
-     						if(str.contentEquals(temp)) {
-     							strB.append(str);
-     							//contentsTxt.setText(strB.toString());
-     								do {									
-     								body=reader.readLine();
-     								if(body==null)break;
-     								testB.append(body);
-     								testB.append("\n");	
-     								ArrayList<String> bodyContents = new ArrayList<>();
-     								bodyContents.add(testB.toString());
-     												//System.out.println(body.toString());
-     								contentsTxt.setText(bodyContents.toString());
-     												if(body.contentEquals("&#3;</BODY></TEXT>")==true)break;	
-     								}while(body!=null);	
-     										
-     						}
-     			}while(str!=null);
-     			
-     	   }
-				}catch(Exception e1) {
+		try {
+	     	   for(int i=0;i<22;i++) {
+	     			BufferedReader reader= new BufferedReader(new FileReader("src\\\\javasearchengine/read/reut2-"+i+".sgm"));
+	     			StringBuilder strB=new StringBuilder();
+	     			String str= "";
+	     			StringBuilder testB=new StringBuilder();
+	     			String body= null;
+	     			
+	     			do {
+	     				str =reader.readLine();
+	     				if(str==null)break;
+	     						if(str.contentEquals(temp)) {
+	     							strB.append(str);
+	     							
+	     								do {									
+	     								body=reader.readLine();
+	     								if(body==null)break;
+	     								testB.append(body);
+	     								testB.append("\n");	
+	     								
+	     								ArrayList<String> bodyContents = new ArrayList<>();
+	     								
+	     								bodyContents.add(testB.toString());
+	     								for(String x: bodyContents) {
+	     								x=x.replaceAll("<DATELINE>", "");
+	     								x=x.replaceFirst("\\s", "");
+	     								x=x.replaceAll("</DATELINE><BODY>","");
+	     								x=x.replaceAll("&#3;</BODY></TEXT>", "");
+	     								x=x.replaceAll("</REUTERS>", "");
+	     								
+	     									contentsTxt.setText(x.toString()+"\n");
+	     										     									    									
+	     									
+	     								}
+	     								
+	     								if(body.contentEquals("</REUTERS>")==true)break;
+	     									
+	     								}while(body!=null);	
+	     										
+	     						}
+      			}while(str!=null);
+      			
+     	   reader.close();
+        }
+        }
+				catch(Exception e1) {
 					JOptionPane.showInternalMessageDialog(null, "Error :"+e1.toString());
 				}
 		}
+	
+
 	public static void date() {
 		String date="<DATE>"+searchTxt.getText()+ "</DATE>";//1;
 		//System.out.println("Hello World");
@@ -215,22 +232,51 @@ public class searchUI extends JFrame {
      								if(body==null)break;
      								testB.append(body);
      								testB.append("\n");	
+     								
      								ArrayList<String> bodyContents = new ArrayList<>();
      								bodyContents.add(testB.toString());
-     												//System.out.println(body.toString());
-     								contentsTxt.setText(bodyContents.toString());
-     												if(body.contentEquals("&#3;</BODY></TEXT>")==true)break;	
+     								
+     								for(String x: bodyContents) {
+     									x=x.replaceAll("<TOPICS></TOPICS>", "");
+     									x=x.replaceAll("<TOPICS><D>", "");
+     								    x=x.replaceAll("</D></TOPICS>", "");
+     								    x=x.replaceAll("<PLACES></PLACES>", "");
+     									x=x.replaceFirst("\\s", "");
+     									x=x.replaceAll("<PLACES><D>usa</D></PLACES>", "");
+     									x=x.replaceAll("<PEOPLE></PEOPLE>", "");
+     									x=x.replaceAll("<ORGS></ORGS>", "");
+     									x=x.replaceAll("<EXCHANGES></EXCHANGES>", "");
+     									x=x.replaceAll("<COMPANIES></COMPANIES>", "");
+     									x=x.replaceAll("<UNKNOWN>", "");
+     									x=x.replaceAll("&#5;&#5;&#5;F Y\r\n" , "");
+     									x=x.replaceAll("&#22;&#22;&#1;f0708&#31;reute" , "");	
+     									x=x.replaceAll("</UNKNOWN>" , "");
+     									x=x.replaceAll("<TEXT>&#2;" , "");	
+     									x=x.replaceAll("<TITLE>" , "");
+     									x=x.replaceAll("</TITLE>" , "");
+     									x=x.replaceAll("<DATELINE>" , "");
+     									x=x.replaceAll("</DATELINE><BODY>" , "");
+     									x=x.replaceAll("&#3;</BODY></TEXT>" , "");
+     									x=x.replaceAll("</REUTERS>" , "");
+     									x=x.replaceAll("&#5;&#5;&#5;F" , "");
+     									
+     								contentsTxt.setText(x.toString().trim()+"\n");
+     								
+     								
+     								}
+     												if(body.contentEquals("</REUTERS>")==true)break;	
      								}while(body!=null);	
      										
      						}
      			}while(str!=null);
-     			
+     			reader.close();
      	   }
 				}catch(Exception e1) {
 					JOptionPane.showInternalMessageDialog(null, "Error :"+e1.toString());
 				}
 		}
-	public static void topic() {
+	
+	public static void topics() {
 		String topic="<TOPICS><D>"+searchTxt.getText()+ "</D></TOPICS>"; //<TOPICS><D>money-fx</D></TOPICS>
 		try {
         	   for(int i=0;i<22;i++) {
@@ -253,18 +299,47 @@ public class searchUI extends JFrame {
         								testB.append("\n");	
         								ArrayList<String> bodyContents = new ArrayList<>();
         								bodyContents.add(testB.toString());
-        												//System.out.println(body.toString());
-        								contentsTxt.setText(bodyContents.toString());
-        												if(body.contentEquals("&#3;</BODY></TEXT>")==true)break;	
+        								for(String x: bodyContents) {
+         									//x=x.replaceAll("<TOPICS></TOPICS>", "");
+         									//x=x.replaceAll("<TOPICS><D>", "");
+         								   // x=x.replaceAll("</D></TOPICS>", "");
+         									//x=x.replaceFirst("\\s", "");
+         									x=x.replaceAll("</D></PLACES>", "");
+         									x=x.replaceAll("<PLACES><D>", "");
+         									x=x.replaceAll("<PLACES></PLACES>", "");
+         									x=x.replaceAll("<PEOPLE></PEOPLE>", "");
+         									x=x.replaceAll("<ORGS></ORGS>", "");
+         									x=x.replaceAll("<EXCHANGES></EXCHANGES>", "");
+         									x=x.replaceAll("<COMPANIES></COMPANIES>", "");
+         									x=x.replaceAll("<UNKNOWN>", "");
+         									x=x.replaceAll("&#5;&#5;&#5;F Y\r\n" , "");
+         									x=x.replaceAll("&#22;&#22;&#1;f0708&#31;reute" , "");	
+         									x=x.replaceAll("</UNKNOWN>" , "");
+         									x=x.replaceAll("<TEXT>&#2;" , "");	
+         									x=x.replaceAll("<TITLE>" , "");
+         									x=x.replaceAll("</TITLE>" , "");
+         									x=x.replaceAll("<DATELINE>" , "");
+         									x=x.replaceAll("</DATELINE><BODY>" , "");
+         									x=x.replaceAll("&#3;</BODY></TEXT>" , "");
+         									x=x.replaceAll("</REUTERS>" , "");
+         									x=x.replaceAll("&#5;&#5;&#5;F" , "");
+         									
+         								contentsTxt.setText(x.toString().trim()+"\n");
+         								
+         								
+         								}
+         												if(body.contentEquals("</REUTERS>")==true)break;		
         								}while(body!=null);	
         										
         						}
         			}while(str!=null);
-        			
+        			reader.close();
         	   }
 				}catch(Exception e1) {
 					JOptionPane.showInternalMessageDialog(null, "Error :"+e1.toString());
 				}
 		
 	}
+	
+	
 	}
